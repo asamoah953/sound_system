@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroSynth Lab — AI Neural Sound Research Laboratory</title>
+    <meta name="description" content="AI-powered neural sound synthesis laboratory for brainwave entrainment, lucid dreaming induction, pineal gland activation, and consciousness research. Generate complex, multi-layered audio from natural language descriptions.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Background Canvas for Neural Network Animation -->
+        <canvas id="neural-bg"></canvas>
+
+        <!-- Header -->
+        <header id="header">
+            <div class="header-left">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 40 40" fill="none">
+                            <circle cx="20" cy="20" r="18" stroke="url(#logo-grad)" stroke-width="2"/>
+                            <path d="M12 20 Q16 10 20 20 Q24 30 28 20" stroke="url(#logo-grad)" stroke-width="2" fill="none"/>
+                            <path d="M10 20 Q15 5 20 20 Q25 35 30 20" stroke="url(#logo-grad)" stroke-width="1.5" fill="none" opacity="0.5"/>
+                            <circle cx="20" cy="20" r="3" fill="url(#logo-grad)"/>
+                            <defs>
+                                <linearGradient id="logo-grad" x1="0" y1="0" x2="40" y2="40">
+                                    <stop offset="0%" stop-color="#00f0ff"/>
+                                    <stop offset="100%" stop-color="#b000ff"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>NeuroSynth<span class="accent">Lab</span></h1>
+                        <span class="version">v3.0 Neural Engine</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-center">
+                <div id="status-indicator" class="status-idle">
+                    <span class="status-dot"></span>
+                    <span class="status-text">IDLE</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="btn-master-toggle" class="btn-icon" title="Master Power">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v10M18.36 6.64A9 9 0 1 1 5.64 6.64"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content">
+            <!-- AI Input Section -->
+            <section id="ai-input-section">
+                <div class="section-header">
+                    <div class="section-icon">🧠</div>
+                    <h2>Neural Sound Architect</h2>
+                    <p class="section-subtitle">Describe any sound — the AI will synthesize it</p>
+                </div>
+                <div class="ai-input-container">
+                    <div class="ai-textarea-wrap">
+                        <textarea id="ai-prompt" placeholder="Describe the sound you want to create...&#10;&#10;Examples:&#10;• A deep cosmic drone with pulsating harmonics at 40Hz, building layers of crystalline overtones&#10;• Binaural beat at 10Hz (alpha waves) with a carrier frequency of 200Hz&#10;• Thunderstorm with sub-bass rumble, rain texture, and distant lightning crackle&#10;• Ethereal choir evolving through harmonic series from 220Hz to 880Hz&#10;• Neural oscillation pattern: gamma 40Hz modulated by theta 6Hz"></textarea>
+                        <div class="ai-input-controls">
+                            <div class="preset-tags" id="preset-tags">
+                                <button class="tag" data-preset="cosmic">🌌 Cosmic Drone</button>
+                                <button class="tag" data-preset="binaural">🧠 Binaural Alpha</button>
+                                <button class="tag" data-preset="thunder">⛈️ Thunder</button>
+                                <button class="tag" data-preset="choir">👼 Ethereal Choir</button>
+                                <button class="tag" data-preset="neural">⚡ Neural Oscillation</button>
+                                <button class="tag" data-preset="crystal">💎 Crystal Resonance</button>
+                                <button class="tag" data-preset="abyss">🌊 Deep Abyss</button>
+                                <button class="tag" data-preset="machine">⚙️ Machine Pulse</button>
+                            </div>
+                            <button id="btn-generate" class="btn-primary">
+                                <span class="btn-icon-inner">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>
+                                </span>
+                                <span>Generate Sound</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- AI Analysis Display -->
+                    <div id="ai-analysis" class="ai-analysis hidden">
+                        <div class="analysis-header">
+                            <span>🔬 AI Analysis</span>
+                            <button id="btn-close-analysis" class="btn-icon-sm">✕</button>
+                        </div>
+                        <div id="analysis-content" class="analysis-content"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Synthesis Control Panel -->
+            <section id="synth-panel">
+                <div class="panel-grid">
+                    <!-- Oscillator Layers -->
+                    <div class="panel-card" id="oscillator-panel">
+                        <div class="card-header">
+                            <h3>🎛️ Oscillator Layers</h3>
+                            <button id="btn-add-osc" class="btn-sm">+ Add Layer</button>
+                        </div>
+                        <div id="oscillator-layers" class="oscillator-layers">
+                            <!-- Dynamically populated -->
+                        </div>
+                    </div>
+
+                    <!-- Effects Chain -->
+                    <div class="panel-card" id="effects-panel">
+                        <div class="card-header">
+                            <h3>✨ Effects Chain</h3>
+                        </div>
+                        <div class="effects-grid">
+                            <div class="effect-module" id="effect-reverb">
+                                <label>Reverb</label>
+                                <input type="range" id="reverb-mix" min="0" max="100" value="20" class="slider">
+                                <span class="slider-value" data-for="reverb-mix">20%</span>
+                                <input type="range" id="reverb-decay" min="0.1" max="10" value="2" step="0.1" class="slider">
+                                <span class="slider-label">Decay: <span class="slider-value" data-for="reverb-decay">2.0s</span></span>
+                            </div>
+                            <div class="effect-module" id="effect-delay">
+                                <label>Delay</label>
+                                <input type="range" id="delay-time" min="0" max="1000" value="300" class="slider">
+                                <span class="slider-label">Time: <span class="slider-value" data-for="delay-time">300ms</span></span>
+                                <input type="range" id="delay-feedback" min="0" max="95" value="40" class="slider">
+                                <span class="slider-label">Feedback: <span class="slider-value" data-for="delay-feedback">40%</span></span>
+                            </div>
+                            <div class="effect-module" id="effect-filter">
+                                <label>Filter</label>
+                                <select id="filter-type" class="select-dark">
+                                    <option value="lowpass">Low Pass</option>
+                                    <option value="highpass">High Pass</option>
+                                    <option value="bandpass">Band Pass</option>
+                                    <option value="notch">Notch</option>
+                                </select>
+                                <input type="range" id="filter-freq" min="20" max="20000" value="5000" class="slider">
+                                <span class="slider-label">Cutoff: <span class="slider-value" data-for="filter-freq">5000Hz</span></span>
+                                <input type="range" id="filter-q" min="0.1" max="20" value="1" step="0.1" class="slider">
+                                <span class="slider-label">Q: <span class="slider-value" data-for="filter-q">1.0</span></span>
+                            </div>
+                            <div class="effect-module" id="effect-distortion">
+                                <label>Distortion</label>
+                                <input type="range" id="distortion-amount" min="0" max="100" value="0" class="slider">
+                                <span class="slider-value" data-for="distortion-amount">0%</span>
+                            </div>
+                            <div class="effect-module" id="effect-chorus">
+                                <label>Chorus</label>
+                                <input type="range" id="chorus-rate" min="0.1" max="10" value="1.5" step="0.1" class="slider">
+                                <span class="slider-label">Rate: <span class="slider-value" data-for="chorus-rate">1.5Hz</span></span>
+                                <input type="range" id="chorus-depth" min="0" max="100" value="30" class="slider">
+                                <span class="slider-label">Depth: <span class="slider-value" data-for="chorus-depth">30%</span></span>
+                            </div>
+                            <div class="effect-module" id="effect-compressor">
+                                <label>Compressor</label>
+                                <input type="range" id="comp-threshold" min="-60" max="0" value="-24" class="slider">
+                                <span class="slider-label">Threshold: <span class="slider-value" data-for="comp-threshold">-24dB</span></span>
+                                <input type="range" id="comp-ratio" min="1" max="20" value="4" class="slider">
+                                <span class="slider-label">Ratio: <span class="slider-value" data-for="comp-ratio">4:1</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Envelope -->
+                    <div class="panel-card" id="envelope-panel">
+                        <div class="card-header">
+                            <h3>📐 Master Envelope (ADSR)</h3>
+                        </div>
+                        <div class="envelope-controls">
+                            <canvas id="envelope-canvas" width="400" height="150"></canvas>
+                            <div class="adsr-sliders">
+                                <div class="adsr-control">
+                                    <label>Attack</label>
+                                    <input type="range" id="env-attack" min="0" max="5" value="0.1" step="0.01" class="slider slider-vertical">
+                                    <span class="slider-value" data-for="env-attack">0.10s</span>
+                                </div>
+                                <div class="adsr-control">
+                                    <label>Decay</label>
+                                    <input type="range" id="env-decay" min="0" max="5" value="0.3" step="0.01" class="slider slider-vertical">
+                                    <span class="slider-value" data-for="env-decay">0.30s</span>
+                                </div>
+                                <div class="adsr-control">
+                                    <label>Sustain</label>
+                                    <input type="range" id="env-sustain" min="0" max="1" value="0.7" step="0.01" class="slider slider-vertical">
+                                    <span class="slider-value" data-for="env-sustain">0.70</span>
+                                </div>
+                                <div class="adsr-control">
+                                    <label>Release</label>
+                                    <input type="range" id="env-release" min="0" max="10" value="1" step="0.01" class="slider slider-vertical">
+                                    <span class="slider-value" data-for="env-release">1.00s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Binaural Control -->
+                    <div class="panel-card" id="binaural-panel">
+                        <div class="card-header">
+                            <h3>🧠 Binaural Beat Engine</h3>
+                        </div>
+                        <div class="binaural-controls">
+                            <div class="binaural-row">
+                                <label>Carrier Frequency</label>
+                                <input type="range" id="binaural-carrier" min="20" max="1000" value="200" class="slider">
+                                <span class="slider-value" data-for="binaural-carrier">200Hz</span>
+                            </div>
+                            <div class="binaural-row">
+                                <label>Beat Frequency</label>
+                                <input type="range" id="binaural-beat" min="0.5" max="40" value="10" step="0.5" class="slider">
+                                <span class="slider-value" data-for="binaural-beat">10Hz</span>
+                            </div>
+                            <div class="binaural-row">
+                                <label>Volume</label>
+                                <input type="range" id="binaural-volume" min="0" max="100" value="50" class="slider">
+                                <span class="slider-value" data-for="binaural-volume">50%</span>
+                            </div>
+                            <div class="brainwave-presets">
+                                <button class="brainwave-btn" data-wave="delta">δ Delta<br><small>0.5-4Hz</small></button>
+                                <button class="brainwave-btn" data-wave="theta">θ Theta<br><small>4-8Hz</small></button>
+                                <button class="brainwave-btn active" data-wave="alpha">α Alpha<br><small>8-14Hz</small></button>
+                                <button class="brainwave-btn" data-wave="beta">β Beta<br><small>14-30Hz</small></button>
+                                <button class="brainwave-btn" data-wave="gamma">γ Gamma<br><small>30-40Hz</small></button>
+                            </div>
+                            <button id="btn-binaural-toggle" class="btn-secondary">▶ Start Binaural</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- NEURO RESEARCH LAB SECTION -->
+            <!-- ============================================ -->
+            <section id="neuro-lab-section">
+                <div class="section-header">
+                    <div class="section-icon">🔬</div>
+                    <h2>Neuro Research Lab</h2>
+                    <p class="section-subtitle">Timed multi-phase brainwave entrainment protocols for consciousness research — pineal gland, hypothalamus, lucid dreaming, astral projection</p>
+                </div>
+
+                <!-- Protocol Selector Cards -->
+                <div id="protocol-cards" class="protocol-cards">
+                    <!-- Dynamically populated -->
+                </div>
+
+                <!-- Active Session Dashboard -->
+                <div id="session-dashboard" class="session-dashboard hidden">
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">
+                            <span id="session-icon" class="session-icon">🧠</span>
+                            <div>
+                                <h3 id="session-protocol-name">Protocol Name</h3>
+                                <p id="session-protocol-desc" class="session-desc">Description</p>
+                            </div>
+                        </div>
+                        <div class="dashboard-controls">
+                            <button id="btn-stop-protocol" class="btn-danger">⏹ Abort Session</button>
+                        </div>
+                    </div>
+
+                    <!-- Brain Target Display -->
+                    <div class="target-regions">
+                        <span class="target-label">Target Regions:</span>
+                        <div id="target-region-tags" class="target-tags"></div>
+                    </div>
+
+                    <!-- Phase Timeline -->
+                    <div class="phase-timeline">
+                        <div id="phase-timeline-bar" class="timeline-bar">
+                            <!-- Phase segments populated dynamically -->
+                        </div>
+                        <div id="phase-timeline-labels" class="timeline-labels"></div>
+                    </div>
+
+                    <!-- Current Phase Display -->
+                    <div class="current-phase-display">
+                        <div class="phase-info">
+                            <div class="phase-badge">
+                                <span id="current-phase-num" class="phase-num">1</span>
+                                <span class="phase-of">/</span>
+                                <span id="total-phases" class="phase-total">5</span>
+                            </div>
+                            <div>
+                                <h4 id="current-phase-name">Phase Name</h4>
+                                <p id="current-phase-desc" class="phase-desc-text">Phase description</p>
+                            </div>
+                        </div>
+                        <div class="phase-timers">
+                            <div class="timer-block">
+                                <span class="timer-label">Phase</span>
+                                <span id="phase-timer" class="timer-value">00:00</span>
+                            </div>
+                            <div class="timer-block">
+                                <span class="timer-label">Total</span>
+                                <span id="total-timer" class="timer-value">00:00</span>
+                            </div>
+                            <div class="timer-block">
+                                <span class="timer-label">Remaining</span>
+                                <span id="remaining-timer" class="timer-value">00:00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session Progress Bar -->
+                    <div class="session-progress">
+                        <div id="session-progress-fill" class="progress-fill"></div>
+                    </div>
+
+                    <!-- Frequency Readout -->
+                    <div class="freq-readout">
+                        <div class="readout-group">
+                            <span class="readout-label">Binaural</span>
+                            <span id="readout-binaural" class="readout-value">—</span>
+                        </div>
+                        <div class="readout-group">
+                            <span class="readout-label">Carrier</span>
+                            <span id="readout-carrier" class="readout-value">—</span>
+                        </div>
+                        <div class="readout-group">
+                            <span class="readout-label">Brainwave</span>
+                            <span id="readout-brainwave" class="readout-value">—</span>
+                        </div>
+                        <div class="readout-group">
+                            <span class="readout-label">Layers</span>
+                            <span id="readout-layers" class="readout-value">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Session Notes -->
+                    <div class="session-notes">
+                        <label>📝 Session Notes (for panel submission)</label>
+                        <textarea id="session-notes" placeholder="Record observations, subjective experiences, timestamps of notable events..."></textarea>
+                    </div>
+
+                    <!-- Export Session Log -->
+                    <div class="session-export-bar">
+                        <button id="btn-export-session" class="btn-accent">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            <span>Export Session Report (JSON)</span>
+                        </button>
+                        <button id="btn-export-session-wav" class="btn-accent">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Export Current Phase WAV</span>
+                        </button>
+                    </div>
+
+                    <!-- References -->
+                    <div class="session-references">
+                        <details>
+                            <summary>📚 Scientific References</summary>
+                            <ul id="session-references-list"></ul>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Visualization Section -->
+            <section id="viz-section">
+                <div class="viz-tabs">
+                    <button class="viz-tab active" data-viz="waveform">Waveform</button>
+                    <button class="viz-tab" data-viz="spectrum">Spectrum</button>
+                    <button class="viz-tab" data-viz="spectrogram">Spectrogram</button>
+                    <button class="viz-tab" data-viz="circular">Circular</button>
+                </div>
+                <div class="viz-container">
+                    <canvas id="viz-canvas"></canvas>
+                    <div class="viz-overlay">
+                        <div id="viz-info" class="viz-info"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Master Controls -->
+            <section id="master-controls">
+                <div class="master-bar">
+                    <div class="master-group">
+                        <button id="btn-play" class="btn-transport btn-play" title="Play">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+                        </button>
+                        <button id="btn-stop" class="btn-transport btn-stop" title="Stop">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                        </button>
+                    </div>
+                    <div class="master-group master-volume">
+                        <label>🔊 Master</label>
+                        <input type="range" id="master-volume" min="0" max="100" value="70" class="slider slider-master">
+                        <span class="slider-value" data-for="master-volume">70%</span>
+                    </div>
+                    <div class="master-group">
+                        <label>Duration</label>
+                        <input type="number" id="sound-duration" value="10" min="1" max="300" class="input-dark">
+                        <span>sec</span>
+                    </div>
+                    <div class="master-group">
+                        <button id="btn-export" class="btn-accent" title="Export as WAV">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Export WAV</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="hidden">
+            <div class="loading-content">
+                <div class="neural-loader">
+                    <div class="neuron n1"></div>
+                    <div class="neuron n2"></div>
+                    <div class="neuron n3"></div>
+                    <div class="synapse s1"></div>
+                    <div class="synapse s2"></div>
+                </div>
+                <p id="loading-text">Neural Engine Processing...</p>
+                <div class="loading-bar"><div id="loading-progress" class="loading-progress"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="synth-engine.js"></script>
+    <script src="ai-engine.js"></script>
+    <script src="neuro-protocols.js"></script>
+    <script src="visualizer.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
